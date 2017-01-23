@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.axiang.coolweather.R;
 import com.axiang.coolweather.model.ActivityList;
+import com.axiang.coolweather.service.AutoUpdateService;
 import com.axiang.coolweather.util.AnalyticalData;
 import com.axiang.coolweather.util.HttpCallbackListener;
 import com.axiang.coolweather.util.HttpUtil;
@@ -158,6 +159,8 @@ public class WeatherActivity extends CoolWeatherManager implements View.OnClickL
         weather_content.setText(sharedPreferences.getString("weather", ""));
         current_time_content.setText("查询时间: " + sharedPreferences.getString("current_time_content", ""));
         weather_linear.setVisibility(View.VISIBLE);
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
     }
 
     @Override
