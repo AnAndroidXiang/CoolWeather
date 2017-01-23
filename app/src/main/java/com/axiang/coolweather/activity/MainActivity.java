@@ -70,11 +70,9 @@ public class MainActivity extends CoolWeatherManager {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean isSelectFlag = sharedPreferences.getBoolean("city_select", false);
-        if(isSelectFlag && i == 0) {
+        if(i == 0) {
             i++;
-            jumpActivity(sharedPreferences, isSelectFlag);
+            jumpActivity();
         }
         setContentView(R.layout.activity_main);
         isWeatherCome = getIntent().getBooleanExtra("isWeatherCome", false);
@@ -226,14 +224,18 @@ public class MainActivity extends CoolWeatherManager {
         }
     }
 
-    private void jumpActivity(SharedPreferences sharedPreferences, boolean isSelectFlag) {  //跳转到WeahterAcitivity
-        Intent intent = new Intent(this, WeatherActivity.class);
-        intent.putExtra("isSelectFlag", isSelectFlag);
-        intent.putExtra("county_name", sharedPreferences.getString("city_name", ""));
-        intent.putExtra("weather_code", sharedPreferences.getString("weather_code", ""));
-        startActivity(intent);
-        finish();
-        return;
+    private void jumpActivity() {  //跳转到WeahterAcitivity
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isSelectFlag = sharedPreferences.getBoolean("city_select", false);
+        if(isSelectFlag) {
+            Intent intent = new Intent(this, WeatherActivity.class);
+            intent.putExtra("isSelectFlag", isSelectFlag);
+            intent.putExtra("county_name", sharedPreferences.getString("city_name", ""));
+            intent.putExtra("weather_code", sharedPreferences.getString("weather_code", ""));
+            startActivity(intent);
+            finish();
+            return;
+        }
     }
 
     @Override
@@ -254,7 +256,7 @@ public class MainActivity extends CoolWeatherManager {
             } else {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 boolean isSelectFlag = sharedPreferences.getBoolean("city_select", false);
-                jumpActivity(sharedPreferences, isSelectFlag);
+                jumpActivity();
             }
         }
     }
