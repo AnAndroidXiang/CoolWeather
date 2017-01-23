@@ -1,6 +1,5 @@
 package com.axiang.coolweather.activity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,7 +9,6 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -19,6 +17,7 @@ import android.widget.Toast;
 
 import com.axiang.coolweather.R;
 import com.axiang.coolweather.db.CoolWeatherDBOperate;
+import com.axiang.coolweather.model.ActivityList;
 import com.axiang.coolweather.model.City;
 import com.axiang.coolweather.model.County;
 import com.axiang.coolweather.model.Province;
@@ -29,7 +28,7 @@ import com.axiang.coolweather.util.HttpUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends Activity {
+public class MainActivity extends CoolWeatherManager {
 
     private ListView content_list;
     private TextView title_text;
@@ -53,7 +52,7 @@ public class MainActivity extends Activity {
     public static final int LEVEL_COUNTY = 2;   //County界面
     private int currentLevel;   //当前所在界面
 
-
+    //退出程序
     private boolean isExit = false;
     public static final int ISEXIT = 0;
     private Handler handler = new Handler() {
@@ -65,7 +64,8 @@ public class MainActivity extends Activity {
         }
     };
 
-    public static int i = 0;
+    public static int i = 0;        //本地是否有过查询天气记录并且刚打开程序
+    private boolean isWeatherCome;  //是否从WeatherActivity跳转来的
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,16 +74,10 @@ public class MainActivity extends Activity {
         boolean isSelectFlag = sharedPreferences.getBoolean("city_select", false);
         if(isSelectFlag && i == 0) {
             i++;
-            Intent intent = new Intent(this, WeatherActivity.class);
-            intent.putExtra("isSelectFlag", isSelectFlag);
-            intent.putExtra("county_name", sharedPreferences.getString("city_name", ""));
-            intent.putExtra("weather_code", sharedPreferences.getString("weather_code", ""));
-            startActivity(intent);
-            finish();
-            return;
+            jumpActivity(sharedPreferences, isSelectFlag);
         }
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+        isWeatherCome = getIntent().getBooleanExtra("isWeatherCome", false);
         initView();
     }
 
@@ -107,6 +101,7 @@ public class MainActivity extends Activity {
                     intent.putExtra("county_name", selectCounty.getCountyName());
                     intent.putExtra("weather_code", selectCounty.getCountyCode());
                     startActivity(intent);
+                    finish();
                 } else {
                     Toast.makeText(MainActivity.this, "发生了未知错误", Toast.LENGTH_SHORT).show();
                 }
@@ -114,6 +109,11 @@ public class MainActivity extends Activity {
         });
         operate = CoolWeatherDBOperate.getDb(this);
         queryProvinces();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void queryProvinces() {     //通过数据库（如果数据库没有再通过Http查询存进数据库）查询所有的Province
@@ -226,6 +226,16 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void jumpActivity(SharedPreferences sharedPreferences, boolean isSelectFlag) {  //跳转到WeahterAcitivity
+        Intent intent = new Intent(this, WeatherActivity.class);
+        intent.putExtra("isSelectFlag", isSelectFlag);
+        intent.putExtra("county_name", sharedPreferences.getString("city_name", ""));
+        intent.putExtra("weather_code", sharedPreferences.getString("weather_code", ""));
+        startActivity(intent);
+        finish();
+        return;
+    }
+
     @Override
     public void onBackPressed() {
         if(currentLevel == LEVEL_CITY) {
@@ -233,12 +243,18 @@ public class MainActivity extends Activity {
         } else if (currentLevel == LEVEL_COUNTY) {
             queryCities();
         } else {
-            if(!isExit) {
-                isExit = true;
-                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
-                handler.sendEmptyMessageDelayed(ISEXIT, 2000);
+            if(!isWeatherCome) {
+                if (!isExit) {
+                    isExit = true;
+                    Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                    handler.sendEmptyMessageDelayed(ISEXIT, 2000);
+                } else {
+                    ActivityList.deleteAllActivity();
+                }
             } else {
-                finish();
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                boolean isSelectFlag = sharedPreferences.getBoolean("city_select", false);
+                jumpActivity(sharedPreferences, isSelectFlag);
             }
         }
     }
