@@ -2,9 +2,12 @@ package com.axiang.coolweather.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
@@ -62,9 +65,23 @@ public class MainActivity extends Activity {
         }
     };
 
+    public static int i = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isSelectFlag = sharedPreferences.getBoolean("city_select", false);
+        if(isSelectFlag && i == 0) {
+            i++;
+            Intent intent = new Intent(this, WeatherActivity.class);
+            intent.putExtra("isSelectFlag", isSelectFlag);
+            intent.putExtra("county_name", sharedPreferences.getString("city_name", ""));
+            intent.putExtra("weather_code", sharedPreferences.getString("weather_code", ""));
+            startActivity(intent);
+            finish();
+            return;
+        }
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
         initView();
@@ -85,7 +102,11 @@ public class MainActivity extends Activity {
                     selectCity = cityList.get(position);
                     queryCounties();
                 } else if (currentLevel == LEVEL_COUNTY) {
-                    Toast.makeText(MainActivity.this, "功能尚未制作", Toast.LENGTH_SHORT).show();
+                    selectCounty = countyList.get(position);
+                    Intent intent = new Intent(MainActivity.this, WeatherActivity.class);
+                    intent.putExtra("county_name", selectCounty.getCountyName());
+                    intent.putExtra("weather_code", selectCounty.getCountyCode());
+                    startActivity(intent);
                 } else {
                     Toast.makeText(MainActivity.this, "发生了未知错误", Toast.LENGTH_SHORT).show();
                 }
@@ -185,7 +206,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onError(Exception e) {
-
+                Toast.makeText(MainActivity.this, "发生了未知错误", Toast.LENGTH_SHORT).show();
             }
         });
     }

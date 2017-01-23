@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/title_county"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="#8B5A2B"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true">
+
+        <TextView
+            android:id="@+id/title_county_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:layout_centerInParent="true"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_below="@id/title_county"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#8c7853">
+
+        <TextView
+            android:id="@+id/text_ptime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFF"
+            android:textSize="18sp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <RelativeLayout
+            android:id="@+id/weather_relative"
+            android:layout_below="@id/text_ptime"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:id="@+id/temp_linear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="30sp"
+                android:layout_centerInParent="true">
+
+                <TextView
+                    android:id="@+id/temp_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="~"
+                    android:textColor="#FFF"
+                    android:textSize="24sp"
+                    />
+
+                <TextView
+                    android:id="@+id/temp1_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@id/temp_content"
+                    android:layout_margin="5dp"
+                    android:textColor="#FFF"
+                    android:textSize="24sp"
+                    />
+
+                <TextView
+                    android:id="@+id/temp2_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/temp_content"
+                    android:layout_margin="5dp"
+                    android:textColor="#FFF"
+                    android:textSize="24sp"
+                    />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/weather_content"
+                android:layout_above="@id/temp_linear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="#FFF"
+                android:textSize="30sp"
+                />
+
+            <TextView
+                android:id="@+id/current_time_content"
+                android:layout_above="@id/weather_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="#FFF"
+                android:textSize="24sp"
+                />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>
