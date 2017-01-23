@@ -30,6 +30,7 @@ public class AutoUpdateService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        //启动一个子线程去更新数据
         new Thread(new Runnable() {
             @Override
             public void run() {
