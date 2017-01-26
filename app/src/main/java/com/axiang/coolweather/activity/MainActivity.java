@@ -255,7 +255,6 @@ public class MainActivity extends CoolWeatherManager {
                 }
             } else {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                boolean isSelectFlag = sharedPreferences.getBoolean("city_select", false);
                 jumpActivity();
             }
         }

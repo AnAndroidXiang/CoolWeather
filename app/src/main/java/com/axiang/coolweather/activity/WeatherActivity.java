@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
@@ -35,8 +37,8 @@ public class WeatherActivity extends CoolWeatherManager implements View.OnClickL
     private TextView weather_content;       //天气情况
     private TextView current_time_content;  //查询时间
     boolean isSelectFlag = false;           //本地是否有过查询天气记录
-    private String weatherCode = "";        //县代号
-    private String countyName = "";         //县名
+    private String weatherCode;             //县代号
+    private String countyName;              //县名
     private ImageView home_back;            //主界面按钮
     private ImageView fresh;                //刷新按钮
 
@@ -77,7 +79,7 @@ public class WeatherActivity extends CoolWeatherManager implements View.OnClickL
             String address = "http://www.weather.com.cn/data/list3/city" + weatherCode + ".xml";
             queryWeatherFromHttp(address, "County");
         } else {
-            Toast.makeText(WeatherActivity.this, "发生了未知错误", Toast.LENGTH_SHORT).show();
+            notKnowEoor();
         }
     }
 
@@ -106,7 +108,12 @@ public class WeatherActivity extends CoolWeatherManager implements View.OnClickL
                 break;
             case R.id.fresh:
                 text_ptime.setText("正在同步...");
-                getWeatherCode(weatherCode);
+                if(!isSelectFlag) {
+                    getWeatherCode(weatherCode);
+                } else {
+                    String address = "http://www.weather.com.cn/data/cityinfo/" + weatherCode + ".html";
+                    queryWeatherFromHttp(address, "Weather");
+                }
                 break;
             default:
                 break;
@@ -128,7 +135,7 @@ public class WeatherActivity extends CoolWeatherManager implements View.OnClickL
                         String url = "http://www.weather.com.cn/data/cityinfo/" + weathers[1] + ".html";
                         queryWeatherFromHttp(url, "Weather");
                     } else {
-                        Toast.makeText(WeatherActivity.this, "发生了未知错误", Toast.LENGTH_SHORT).show();
+                        notKnowEoor();
                     }
                 } else if("Weather".equals(code)) {
                     AnalyticalData.analyticalWeatherData(WeatherActivity.this, response);
@@ -139,13 +146,22 @@ public class WeatherActivity extends CoolWeatherManager implements View.OnClickL
                         }
                     });
                 } else {
-                    Toast.makeText(WeatherActivity.this, "发生了未知错误", Toast.LENGTH_SHORT).show();
+                    notKnowEoor();
                 }
             }
 
             @Override
             public void onError(Exception e) {
-                Toast.makeText(WeatherActivity.this, "发生了未知错误", Toast.LENGTH_SHORT).show();
+                notKnowEoor();
+            }
+        });
+    }
+
+    private void notKnowEoor() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                text_ptime.setText("同步失败");
             }
         });
     }
@@ -158,9 +174,9 @@ public class WeatherActivity extends CoolWeatherManager implements View.OnClickL
         temp2_content.setText(sharedPreferences.getString("temp2", ""));
         weather_content.setText(sharedPreferences.getString("weather", ""));
         current_time_content.setText("查询时间: " + sharedPreferences.getString("current_time_content", ""));
-        weather_linear.setVisibility(View.VISIBLE);
-        Intent intent = new Intent(this, AutoUpdateService.class);
-        startService(intent);
+        if(weather_linear.getVisibility() == View.GONE) {
+            weather_linear.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -170,6 +186,8 @@ public class WeatherActivity extends CoolWeatherManager implements View.OnClickL
             Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
             handler.sendEmptyMessageDelayed(ISEXIT, 2000);
         } else {
+            Intent intent = new Intent(this, AutoUpdateService.class);
+            startService(intent);
             ActivityList.deleteAllActivity();
         }
     }

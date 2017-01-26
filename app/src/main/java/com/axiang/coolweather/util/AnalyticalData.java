@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.axiang.coolweather.db.CoolWeatherDBOperate;
 import com.axiang.coolweather.model.City;
@@ -81,7 +82,7 @@ public class AnalyticalData {
             String weather = weatherObject.getString("weather");
             String ptime = weatherObject.getString("ptime");
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-            String currentDate = new SimpleDateFormat("yyyy年MM月dd").format(new Date());
+            String currentDate = new SimpleDateFormat("yyyy年MM月dd日").format(new Date());
             editor.putBoolean("city_select", true);
             editor.putString("city_name", cityName);
             editor.putString("weather_code", weatherCode);
